@@ -8,17 +8,19 @@
 import SwiftUI
 
 struct RootView: View {
+    @Binding var isAuthenticated: Bool
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        if isAuthenticated {
+            HomeView(isAuthenticated: $isAuthenticated)
+        } else {
+            NavigationStack {
+                LoginView(isAuthenticated: $isAuthenticated)
+            }
         }
-        .padding()
     }
 }
 
 #Preview {
-    RootView()
+    RootView(isAuthenticated: .constant(true))
 }
