@@ -8,19 +8,19 @@
 import SwiftUI
 
 struct RootView: View {
-    @Binding var isAuthenticated: Bool
+    @State private var isLoggedIn = false
     
     var body: some View {
-        if isAuthenticated {
-            HomeView(isAuthenticated: $isAuthenticated)
+        if isLoggedIn {
+            HomeView()
         } else {
             NavigationStack {
-                LoginView(isAuthenticated: $isAuthenticated)
+                LoginView(isLoggedIn: .constant(false))
             }
         }
     }
 }
 
 #Preview {
-    RootView(isAuthenticated: .constant(true))
+    RootView()
 }

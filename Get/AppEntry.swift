@@ -8,12 +8,10 @@
 import SwiftUI
 
 @main
-struct AppEntry: App {
-    @State private var isAuthenticated = false
-    
+struct AppEntry: App {    
     var body: some Scene {
         WindowGroup {
-            RootView(isAuthenticated: $isAuthenticated)
+            RootView()
         }
     }
 }
