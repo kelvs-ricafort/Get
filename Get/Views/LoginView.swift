@@ -18,6 +18,7 @@ struct LoginView: View {
     // MARK: - UI State
     @State private var errorMessage: String?
     @State private var isLoading = false
+    @State private var navigateToHome = false
     
     var body: some View {
         NavigationStack {
@@ -71,6 +72,10 @@ struct LoginView: View {
             .padding()
             .navigationTitle("Login")
             .navigationBarTitleDisplayMode(.inline)
+            
+            .navigationDestination(isPresented: $navigateToHome) {
+                HomeView()
+            }
         }
     }
     
@@ -83,12 +88,24 @@ struct LoginView: View {
             return
         }
         
-        guard !email.contains("@") else {
+        guard email.contains("@") else {
             errorMessage = "Please enter a valid email."
             return
         }
         
         isLoading = true
+        
+        // Simulated registration
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            isLoading = false
+            
+            if email.lowercased() == "kelvs.r@outlook.com" && password == "12345678" {
+                isAuthenticated = true
+                navigateToHome = true
+            } else {
+                errorMessage = "Invalid email or password."
+            }
+        }
     }
 }
 
