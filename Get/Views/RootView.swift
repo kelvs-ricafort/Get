@@ -15,7 +15,7 @@ struct RootView: View {
             HomeView()
         } else {
             NavigationStack {
-                LoginView(isLoggedIn: .constant(false))
+                LoginView(isAuthenticated: .constant(false))
             }
         }
     }
