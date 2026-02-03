@@ -10,11 +10,11 @@ import Foundation
 struct SearchCategory: Identifiable {
     let id = UUID()
     let name: String
-    let subcategory: [String]
+    let subcategories: [String]
 }
 
 let categoryOptions: [SearchCategory] = [
-    SearchCategory(name: "Accessibility", subcategory: [
+    SearchCategory(name: "Accessibility", subcategories: [
         "Wheelchair Access",
         "Ramps",
         "Elevators",
@@ -23,10 +23,10 @@ let categoryOptions: [SearchCategory] = [
         "Braille Signage",
         "Hearing Loop"
     ]),
-    SearchCategory(name: "Senior Friendly", subcategory: [
+    SearchCategory(name: "Senior Friendly", subcategories: [
         "Senior Discount"
     ]),
-    SearchCategory(name: "Pet-Friendly", subcategory: [
+    SearchCategory(name: "Pet-Friendly", subcategories: [
         "Outdoor Spaces",
         "Water bowls",
         "No Size Restrictions",
@@ -34,7 +34,7 @@ let categoryOptions: [SearchCategory] = [
         "Leash Friendly Areas",
         "Indoor Pets Allowed"
     ]),
-    SearchCategory(name: "Sustaibale", subcategory: [
+    SearchCategory(name: "Sustaibale", subcategories: [
         "Eco Certifications",
         "Renewable Energy",
         "Waste Reduction",
