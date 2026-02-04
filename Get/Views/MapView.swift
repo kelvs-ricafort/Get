@@ -12,6 +12,7 @@ struct MapView: View {
     
     @State var camera: MapCameraPosition = .automatic
     @State private var query = ""
+    @State private var isEditing = false
     
     private let places: [Place] = [
         Place(name: "Apple Park", coordinate: .init(latitude: 37.3349, longitude: -122.0090)),
@@ -51,7 +52,7 @@ struct MapView: View {
                 .background(.thinMaterial)
             }
             .mapStyle(.imagery)
-            SearchBar(text: $query) {
+            SearchBar(text: $query, isEditing: $isEditing) {
                 print("Searching for: ", query)
             }
         }

@@ -9,10 +9,11 @@ import SwiftUI
 
 struct SearchView: View {
     @State private var query = ""
-    @FocusState private var queryBoxFocused: Bool
+    @State private var isEditing = false
+    
     @State private var selectedCategory: SearchCategory? = nil
     @State private var selectedSubcategories: Set<String> = []
-    @State private var isCategoryExpanded: Bool = false
+    @State private var expandedCategory: SearchCategory? = nil
     
     private let items = [
         "Apple Park",
@@ -27,64 +28,60 @@ struct SearchView: View {
     
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                SearchBar(text: $query) {
+            VStack(spacing: 12) {
+                
+                // MARK: - Search Bar
+                SearchBar(
+                    text: $query,
+                    isEditing: $isEditing
+                ) {
                     performSearch()
                 }
-                .focused($queryBoxFocused)
-                .padding(.top)
                 
-                // Categories
-                HStack {
-                    Button {
-                        isCategoryExpanded.toggle()
-                    } label: {
-                        HStack {
-                            Text(selectedCategory?.name ?? "Select Category")
-                                .font(.headline)
-                            Image(systemName: isCategoryExpanded ? "chevron.up": "chevron.down")
-                                .font(.subheadline)
+                // MARK: - Categories (Horizontal, NOT scrollable)
+                HStack(spacing: 12) {
+                    ForEach(categoryOptions) { category in
+                        Button {
+                            expandedCategory = expandedCategory == category ? nil : category
+                            selectedCategory = category
+                            selectedSubcategories.removeAll()
+                        } label: {
+                            HStack(spacing: 4) {
+                                Text(category.name)
+                                    .font(.caption)
+                                
+                                Image(systemName: expandedCategory == category
+                                      ? "chevron.up"
+                                      : "chevron.down")
+                                .font(.caption2)
+                            }
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(
+                                selectedCategory?.id == category.id
+                                ? .blue.opacity(0.6)
+                                : .gray.opacity(0.2)
+                            )
+                            .foregroundStyle(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
                         }
-                        .padding(.vertical, 8)
-                        .padding(.horizontal, 12)
-                        .background(.gray.opacity(0.2))
-                        .foregroundStyle(.black)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
-                    Spacer()
                 }
                 .padding(.horizontal)
-                .padding(.vertical, 4)
                 
-                // Category options shown when expanded
-                if isCategoryExpanded {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 12) {
-                            ForEach(categoryOptions) { category in
-                                Button(category.name) {
-                                    selectedCategory = category
-                                    selectedSubcategories.removeAll()
-                                    isCategoryExpanded = false
-                                }
-                                .padding(.vertical, 8)
-                                .padding(.horizontal, 12)
-                                .background(selectedCategory?.id == category.id ? .blue.opacity(0.7) : .gray.opacity(0.2))
-                                .foregroundStyle(.white)
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
-                            }
-                        }
-                        .padding(.horizontal)
-                    }
-                }
-                
-                // Subcategories
-                if let category = selectedCategory {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 12) {
-                            ForEach(category.subcategories, id: \.self) { sub in
-                                HStack(spacing: 6) {
-                                    Spacer().frame(width: 6)
-                                    Toggle(isOn: Binding(
+                // MARK: - Subcategories
+                if let category = expandedCategory {
+                    VStack(alignment: .leading, spacing: 8) {
+                        ForEach(category.subcategories, id: \.self) { sub in
+                            HStack {
+                                Text(sub)
+                                    .font(.subheadline)
+                                
+                                Spacer()   // ✅ spacer before toggle
+                                
+                                Toggle(
+                                    "",
+                                    isOn: Binding(
                                         get: { selectedSubcategories.contains(sub) },
                                         set: { isOn in
                                             if isOn {
@@ -93,51 +90,52 @@ struct SearchView: View {
                                                 selectedSubcategories.remove(sub)
                                             }
                                         }
-                                    )) {
-                                        Text(sub)
-                                    }
-                                    .toggleStyle(.switch)
-                                    .padding(.vertical, 6)
-                                    .padding(.horizontal, 10)
-                                    .background(selectedSubcategories.contains(sub) ? .green.opacity(0.7): .gray.opacity(0.2))
-                                    .foregroundStyle(.white)
-                                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                                }
+                                    )
+                                )
+                                .labelsHidden()
                             }
+                            Divider()
                         }
-                        .padding(.horizontal)
-                        .padding(.bottom, 4)
                     }
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .padding(.horizontal)
                 }
-                // Filtered results
+                
+                // MARK: - Results
                 List(filteredResults(), id: \.self) { item in
                     SectionCard(title: item)
                 }
                 .listStyle(.plain)
+                
             }
             .navigationTitle("Search")
             .navigationBarTitleDisplayMode(.inline)
         }
     }
     
+    // MARK: - Search Logic
     private func performSearch() {
-        print("Search: ", query)
-        print("Category:", selectedCategory?.name ?? "All")
-        print("Subcategories:", Array(selectedSubcategories))
+        print("Query:", query)
+        print("Category:", selectedCategory?.name ?? "None")
+        print("Subcategories:", selectedSubcategories)
     }
     
     private func filteredResults() -> [String] {
         var filtered = items
         
         if !query.isEmpty {
-            filtered = filtered.filter { $0.localizedCaseInsensitiveContains(query) }
+            filtered = filtered.filter {
+                $0.localizedCaseInsensitiveContains(query)
+            }
         }
         
         if !selectedSubcategories.isEmpty {
             filtered = filtered.filter { item in
-                selectedSubcategories.contains(where: { sub in
-                    item.localizedCaseInsensitiveContains(sub)
-                })
+                selectedSubcategories.contains {
+                    item.localizedCaseInsensitiveContains($0)
+                }
             }
         }
         

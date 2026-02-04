@@ -9,16 +9,15 @@ import SwiftUI
 
 struct SearchBar: View {
     @Binding var text: String
+    @Binding var isEditing: Bool
+    
     var onSearch: () -> Void
     @FocusState var queryBoxFocused: Bool
     @State var showOptions = false
-
-    
-    @State private var isEditing = false
     
     var body: some View {
         HStack(spacing: 8) {
-            TextField("Search For places, or categories", text: $text)
+            TextField("Search for places, or categories", text: $text)
                 .textFieldStyle(.roundedBorder)
                 .autocapitalization(.none)
                 .submitLabel(.search)
@@ -44,7 +43,10 @@ struct SearchBar: View {
 }
 
 #Preview {
-    SearchBar(text: .constant("Wheelchair Access")) {
+    SearchBar(
+        text: .constant("Wheelchair Access"),
+        isEditing: .constant(true)
+    ) {
         print("Search Tapped")
     }
     .padding()

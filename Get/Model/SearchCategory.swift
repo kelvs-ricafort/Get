@@ -7,11 +7,18 @@
 
 import Foundation
 
-struct SearchCategory: Identifiable {
+struct SearchCategory: Identifiable, Equatable {
     let id = UUID()
     let name: String
     let subcategories: [String]
+    
+    
+    // Equatable based on id
+    static func == (lhs: SearchCategory, rhs: SearchCategory) -> Bool {
+        lhs.id == rhs.id
+    }
 }
+
 
 let categoryOptions: [SearchCategory] = [
     SearchCategory(name: "Accessibility", subcategories: [
