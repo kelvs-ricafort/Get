@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct HomeView: View {
+    @State private var isAuthenticated: Bool = true
+    
     var body: some View {
         TabView {
             MapView()
@@ -38,7 +40,7 @@ struct HomeView: View {
                         Text("Contribute")
                     }
                 }
-            ProfileView()
+            ProfileView(isAuthenticated: $isAuthenticated)
                 .tabItem {
                     VStack {
                         Image(systemName: "person")
